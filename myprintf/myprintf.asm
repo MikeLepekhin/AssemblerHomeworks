@@ -31,8 +31,8 @@ _itoa_loop:
         
         mov rdx, 0
         div rcx
-        add rdx, '0'
-        push rdx
+        mov rbx, [digits + rdx]
+        push rbx
 
         inc r10d
         jmp _itoa_loop
@@ -43,27 +43,44 @@ _itoa_end:
         jmp stack_to_output
 
 
-itoa_shifts:
+itoa_bin:
         mov r10d, 0
 
-_itoa_shifts_loop:
+_itoa_bin_loop:
         cmp rax, 0
-        je _itoa_shifts_end
+        je _itoa_bin_end
         
         mov rdx, rax
-        and rdx, 2
-        add rdx, '0'
-        push rdx
+        and rdx, 1
+        mov rbx, [digits + rdx]
+        push rbx
 
         shr rax, 1
         inc r10d
-        jmp _itoa_shifts_loop
-         
-        
+        jmp _itoa_bin_loop
 
-_itoa_shifts_end:
+_itoa_bin_end:
         jmp stack_to_output
 
+
+itoa_hex:
+        mov r10d, 0
+
+_itoa_hex_loop:
+        cmp rax, 0
+        je _itoa_hex_end
+        
+        mov rdx, rax
+        and rdx, 15
+        mov rbx, [digits + rdx]
+        push rbx
+
+        shr rax, 4
+        inc r10d
+        jmp _itoa_hex_loop
+
+_itoa_hex_end:
+        jmp stack_to_output
 
 display_text:
         mov eax, 4
@@ -75,11 +92,10 @@ display_text:
 
         ret
 
-myprintf:
-       
-        mov eax, 2
-        mov rcx, 2
-        call itoa_shifts
+myprintf:       
+        mov eax, 12
+        mov rcx, 10
+        call itoa_hex
         call display_text 
 
         ; Terminate program
