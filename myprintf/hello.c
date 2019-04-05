@@ -3,9 +3,12 @@
 int main(int argc, char* argv[]) {
     extern myprintf();
     printf("I'm running the code in С\n");
-    
-    myprintf();
+   
+    for (int i = 0; i < 10; ++i) {
+        myprintf(i);
+        printf("\n");
+    }
 
-    printf("I have finished\n");
+    printf("\nI have finished\n");
     return 0;
 }

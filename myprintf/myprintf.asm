@@ -25,12 +25,13 @@ _stack_to_output_end:
 
 itoa:
         mov r10d, 0
+        mov r12d, 10
 _itoa_loop:
         cmp rax, 0
         je _itoa_end
         
         mov rdx, 0
-        div rcx
+        div r12d
         mov rbx, [digits + rdx]
         push rbx
 
@@ -92,10 +93,23 @@ display_text:
 
         ret
 
-myprintf:       
-        mov eax, 12
-        mov rcx, 10
-        call itoa_hex
+handle_params:
+        pop rax
+        pop rbx
+
+        push rdi
+
+        push rbx
+        push rax
+        ret
+
+myprintf:
+        call handle_params
+
+        pop rsi
+        pop rax
+
+        call itoa
         call display_text 
 
         ; Terminate program
@@ -103,4 +117,5 @@ myprintf:
 ;	mov ebx,0            ; exit with error code 0
 ;	int 80h              ; call the kernel
         
+        push rsi
         ret
