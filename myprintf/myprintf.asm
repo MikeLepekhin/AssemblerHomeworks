@@ -103,19 +103,29 @@ handle_params:
         push rax
         ret
 
+handle_char:
+        mov eax, 4
+        mov ebx, 1
+        mov ecx, [rdi]
+        mov edx, 1
+        int 80h
+
+        ret
+
 myprintf:
-        call handle_params
-
+        call handle_params         
         pop rsi
-        pop rax
+        pop rdi
+_myprintf_format_loop:        
+        cmp byte [rdi], 0
+        je _myprintf_ret
 
-        call itoa
-        call display_text 
+        call handle_char
 
-        ; Terminate program
-;	mov eax,1            ; 'exit' system call
-;	mov ebx,0            ; exit with error code 0
-;	int 80h              ; call the kernel
-        
+        inc rdi
+        ;call itoa
+        ;call display_text 
+
+_myprintf_ret:
         push rsi
         ret

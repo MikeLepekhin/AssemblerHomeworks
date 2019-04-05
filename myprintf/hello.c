@@ -5,7 +5,7 @@ int main(int argc, char* argv[]) {
     printf("I'm running the code in С\n");
    
     for (int i = 0; i < 10; ++i) {
-        myprintf(i);
+        myprintf("hello!");
         printf("\n");
     }
 
