@@ -84,11 +84,21 @@ _itoa_hex_end:
         jmp stack_to_output
 
 display_text:
+        cmp r9d, 0
+        je _display_text_zero
+
         mov eax, 4
         mov ebx, 1
         mov ecx, output
-        mov edx, 0
         mov edx, r9d
+        int 80h
+
+        ret
+_display_text_zero:
+        mov eax, 4
+        mov ebx, 1
+        mov ecx, digits
+        mov edx, 1
         int 80h
 
         ret
