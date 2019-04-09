@@ -97,6 +97,11 @@ handle_params:
         pop rax
         pop rbx
 
+        push r9
+        push r8
+        push rcx
+        push rdx
+        push rsi
         push rdi
 
         push rbx
@@ -106,26 +111,70 @@ handle_params:
 handle_char:
         mov eax, 4
         mov ebx, 1
-        mov ecx, [rdi]
+        mov rcx, rdi
         mov edx, 1
         int 80h
-
+        
         ret
 
 myprintf:
         call handle_params         
+        mov r13, 0 
+
         pop rsi
         pop rdi
+        inc r13
+
 _myprintf_format_loop:        
         cmp byte [rdi], 0
         je _myprintf_ret
+        cmp byte [rdi], '%'
+        je _myprintf_handle_int
 
         call handle_char
 
         inc rdi
-        ;call itoa
-        ;call display_text 
+        jmp _myprintf_format_loop 
+
+_myprintf_handle_int:
+        inc rdi
+        pop rax
+        inc r13
+
+        cmp byte [rdi], 'b'
+        je _handle_int_bin
+        
+        cmp byte [rdi], 'x'
+        je _handle_int_hex
+        jmp _handle_int_dec
+
+_handle_int_dec:
+        call itoa
+        call display_text
+        inc rdi
+        jmp _myprintf_format_loop 
+
+_handle_int_bin:
+        call itoa_bin
+        call display_text
+        inc rdi
+        jmp _myprintf_format_loop 
+        
+_handle_int_hex:
+        call itoa_hex
+        call display_text
+        inc rdi
+        jmp _myprintf_format_loop 
 
 _myprintf_ret:
+        cmp r13, 6 
+        jl _myprintf_fix_stack
+        
         push rsi
         ret
+
+_myprintf_fix_stack:
+        pop rdi
+        inc r13
+        jmp _myprintf_ret
+        
