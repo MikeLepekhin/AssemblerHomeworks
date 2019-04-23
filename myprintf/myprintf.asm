@@ -104,7 +104,7 @@ _display_text_zero:
 
         ret
 
-_display_text_percent:
+_display_text_char:
         mov eax, 4
         mov ebx, 1
         mov ecx, digits
@@ -112,6 +112,18 @@ _display_text_percent:
         mov edx, 1
         int 80h
 
+        ret
+
+_display_text_string:
+        cmp byte [r14], 0
+        je _display_text_zero_ret
+        mov ax, [r14]
+        mov byte [digits + 16], al
+        call _display_text_char
+        inc r14
+        jmp _display_text_string
+
+_display_text_zero_ret
         ret
 
 handle_params:
@@ -178,6 +190,8 @@ _myprintf_handle_int:
         cmp byte [rdi], 'c'
         je _handle_char
 
+        cmp byte [rdi], 's'
+        je _handle_string
 
 _handle_int_dec:
         call itoa
@@ -199,13 +213,19 @@ _handle_int_hex:
 
 _handle_percent:
         mov byte [digits + 16], '%'
-        call _display_text_percent
+        call _display_text_char
         inc rdi
         jmp _myprintf_format_loop 
 
 _handle_char:
         mov byte [digits + 16], al
-        call _display_text_percent
+        call _display_text_char
+        inc rdi
+        jmp _myprintf_format_loop 
+
+_handle_string:
+        mov r14, rax
+        call _display_text_string
         inc rdi
         jmp _myprintf_format_loop 
 
