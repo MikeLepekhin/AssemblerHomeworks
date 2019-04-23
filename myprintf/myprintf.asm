@@ -1,6 +1,6 @@
 ; in the data section
 section .data
-	digits:     db '0123456789abcdef',0
+	digits:     db '0123456789abcdef?',0
         output: db '00000000000000000000000000000',0
         
 
@@ -94,10 +94,21 @@ display_text:
         int 80h
 
         ret
+
 _display_text_zero:
         mov eax, 4
         mov ebx, 1
         mov ecx, digits
+        mov edx, 1
+        int 80h
+
+        ret
+
+_display_text_percent:
+        mov eax, 4
+        mov ebx, 1
+        mov ecx, digits
+        add ecx, 16
         mov edx, 1
         int 80h
 
@@ -148,6 +159,10 @@ _myprintf_format_loop:
 
 _myprintf_handle_int:
         inc rdi
+
+        cmp byte [rdi], '%'
+        je _handle_percent
+
         pop rax
         inc r13
 
@@ -156,7 +171,13 @@ _myprintf_handle_int:
         
         cmp byte [rdi], 'x'
         je _handle_int_hex
-        jmp _handle_int_dec
+        
+        cmp byte [rdi], 'd'
+        je _handle_int_dec
+ 
+        cmp byte [rdi], 'c'
+        je _handle_char
+
 
 _handle_int_dec:
         call itoa
@@ -176,6 +197,18 @@ _handle_int_hex:
         inc rdi
         jmp _myprintf_format_loop 
 
+_handle_percent:
+        mov byte [digits + 16], '%'
+        call _display_text_percent
+        inc rdi
+        jmp _myprintf_format_loop 
+
+_handle_char:
+        mov byte [digits + 16], al
+        call _display_text_percent
+        inc rdi
+        jmp _myprintf_format_loop 
+
 _myprintf_ret:
         cmp r13, 6 
         jl _myprintf_fix_stack
@@ -188,3 +221,4 @@ _myprintf_fix_stack:
         inc r13
         jmp _myprintf_ret
         
+
