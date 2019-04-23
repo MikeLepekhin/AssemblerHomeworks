@@ -1,8 +1,13 @@
+#ifndef OPT_HASH_TABLE
+#define OPT_HASH_TABLE
+
 #include <cstdio>
 #include <iostream>
 #include <list>
 #include <string>
 #include <algorithm>
+
+#include "opt_list.h"
 
 class OptHashTable {
 private:
@@ -10,14 +15,14 @@ private:
     static const long long P = 127;
 
     struct Bucket {
-        std::list<std::string> values;
+        OptBidirectionalList<std::string> values;
 
         void add(const std::string& s) {
-            values.push_back(s);
+            values.add(s);
         }
 
         bool find(const std::string& s) {
-            return std::find(values.begin(), values.end(), s) != values.end();
+            return values.find(s);
         }
     }; 
 
@@ -53,3 +58,5 @@ public:
         return buckets[getHash(s)].find(s);
     }
 };
+
+#endif

@@ -5,7 +5,7 @@
 
 template<class HashTable>
 void simpleTest() {
-    std::cout << "simpleTest\n";
+    std::cout << "SimpleTest\n";
 
     HashTable hash_table;
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
@@ -24,4 +24,21 @@ void simpleTest() {
     std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << '\n';
 
     std::cout << count << " items were found\n";
+}
+
+
+template<class List>
+void listTest() {
+    std::cout << "ListTest\n";
+
+    List my_list;
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+     
+
+    for (size_t i = 0; i < 10000; ++i) {
+        my_list.add(i);
+    }
+
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << '\n';
 }
