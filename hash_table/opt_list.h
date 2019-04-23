@@ -52,7 +52,7 @@ public:
         return item_count_;
     }
 
-    void add(const T& item) {
+    void insert(const T& item) {
         if (item_count_ + 2 == buf_size_) {
             extend();
         }
@@ -105,7 +105,7 @@ public:
         return item_count_;
     }
 
-    void add(const T& item) {
+    void insert(const T& item) {
         if (item_count_ + 2 == buf_size_) {
             extend();
         }

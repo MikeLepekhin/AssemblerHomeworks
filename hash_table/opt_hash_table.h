@@ -18,7 +18,7 @@ private:
         OptBidirectionalList<std::string> values;
 
         void add(const std::string& s) {
-            values.add(s);
+            values.insert(s);
         }
 
         bool find(const std::string& s) {
