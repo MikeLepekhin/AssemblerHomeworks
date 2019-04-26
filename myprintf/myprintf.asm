@@ -1,14 +1,14 @@
 ; in the data section
 section .data
-	digits:     db '0123456789abcdef?',0
-        output: db '00000000000000000000000000000',0
+	digits:     db '0123456789abcdef?',0           
+        output: db '00000000000000000000000000000',0    ; buffer for printing digits
         
 
 ; Code goes in the text section
 section .text
 	global myprintf 
 
-stack_to_output:
+stack_to_output:                       ; move digits from stack to utput buffer
         mov r9d, r10d
         mov r10d, 0
 _stack_to_output_loop:
@@ -23,7 +23,7 @@ _stack_to_output_loop:
 _stack_to_output_end:
         ret
 
-itoa:
+itoa:                                 ; convert integer to string of decimal representation
         mov r10d, 0
         mov r12d, 10
 _itoa_loop:
@@ -44,7 +44,7 @@ _itoa_end:
         jmp stack_to_output
 
 
-itoa_bin:
+itoa_bin:                           ; convert integer to string of binary representation
         mov r10d, 0
 
 _itoa_bin_loop:
@@ -64,7 +64,7 @@ _itoa_bin_end:
         jmp stack_to_output
 
 
-itoa_hex:
+itoa_hex:                         ; convert integer to string of heximal representation
         mov r10d, 0
 
 _itoa_hex_loop:
@@ -83,7 +83,7 @@ _itoa_hex_loop:
 _itoa_hex_end:
         jmp stack_to_output
 
-display_text:
+display_text:                    ; display text written in output buffer
         cmp r9d, 0
         je _display_text_zero
 
@@ -95,16 +95,11 @@ display_text:
 
         ret
 
-_display_text_zero:
-        mov eax, 4
-        mov ebx, 1
-        mov ecx, digits
-        mov edx, 1
-        int 80h
+_display_text_zero:            ; display zero character
+        mov byte [digits + 16], '0'
+        jmp _display_text_char
 
-        ret
-
-_display_text_char:
+_display_text_char:            ; display one character from [digits + 16]
         mov eax, 4
         mov ebx, 1
         mov ecx, digits
@@ -114,19 +109,19 @@ _display_text_char:
 
         ret
 
-_display_text_string:
+_display_text_string:         ; display string with pointer in r14 
         cmp byte [r14], 0
-        je _display_text_zero_ret
+        je _display_text_string_ret
         mov ax, [r14]
         mov byte [digits + 16], al
         call _display_text_char
         inc r14
         jmp _display_text_string
 
-_display_text_zero_ret
+_display_text_string_ret:
         ret
 
-handle_params:
+handle_params:               ; push all the parameters of function onto stack
         pop rax
         pop rbx
 
@@ -150,7 +145,7 @@ handle_char:
         
         ret
 
-myprintf:
+myprintf:                 ; general function
         call handle_params         
         mov r13, 0 
 

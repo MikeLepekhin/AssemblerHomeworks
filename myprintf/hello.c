@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 int main(int argc, char* argv[]) {
-    extern myprintf();
+    extern void myprintf();
     printf("I'm running the code in С\n");
    
     for (int i = 10; i < 12; ++i) {
