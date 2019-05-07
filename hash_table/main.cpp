@@ -14,5 +14,7 @@ int main() {
     stdlistTest(10000);   
     listTest<OptList<size_t>>(100000000);   
     stdlistTest(100000000);   
+    listFindTest<OptList<size_t>>(100000);   
+    stdlistFindTest(100000);   
     return 0;
 }

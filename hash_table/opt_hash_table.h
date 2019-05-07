@@ -38,7 +38,7 @@ public:
         long long result = 0;
 
         for (size_t i = 0; i < s.size(); ++i) {
-            result = (result * P) % MODULO;
+            result = (result * P + s[i]) % MODULO;
         }
         return result;
     }

@@ -76,6 +76,55 @@ public:
 
 
 template <class T>
+class SimpleList {
+private:
+    const size_t INIT_BUF_SIZE = 32;
+    const size_t EXTENSION_COEFF = 2;
+
+    T* buf_{nullptr};
+    size_t buf_size_{INIT_BUF_SIZE};
+    size_t item_count_{0};
+
+    void extend() {
+        T* new_buf = new T[buf_size_ * EXTENSION_COEFF];
+
+        for (size_t i = 0; i <= item_count_; ++i) {
+            new_buf[i] = buf_[i];
+        }
+        buf_size_ *= EXTENSION_COEFF;
+
+        delete[] buf_;
+        buf_ = new_buf;
+    }
+public:
+    SimpleList() {
+        buf_ = new T[INIT_BUF_SIZE];
+    }
+
+    size_t size() const {
+        return item_count_;
+    }
+
+    void insert(const T& item) {
+        if (item_count_ + 2 == buf_size_) {
+            extend();
+        }
+        buf_[++item_count_] = item;
+    }
+
+    bool find(const T& item) {
+       for (size_t i = 1; i <= item_count_; ++i) {
+          if (buf_[i] == item) {
+              return true;
+          }
+       }
+
+       return false;
+    }
+};
+
+
+template <class T>
 class OptList {
 private:
     const size_t INIT_BUF_SIZE = 32;
