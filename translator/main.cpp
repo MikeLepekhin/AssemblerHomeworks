@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cstring>
-#include <cstdio>
 
 #include "common_classes.h"
 #include "translator.h"
@@ -18,6 +17,24 @@ char getFlag(char* str) {
     return '?';
   }
   return str[1];
+}
+
+void writeHeader(char* output_filename) {
+  SmartFile header_file("header.asm");
+
+  if (!header_file.getFile()) {
+    printf("header file was not found");
+    exit(0);
+  }
+
+  SmartFile output_file(output_filename, "w");
+  FILE* header_ptr = header_file.getFile();
+  FILE* output_ptr = output_file.getFile();
+
+  char ch;
+  while( ( ch = fgetc(header_ptr) ) != EOF ) {
+    fputc(ch, output_ptr);
+  }
 }
 
 int main(int argc, char* argv[]) {
@@ -55,13 +72,15 @@ int main(int argc, char* argv[]) {
     printf("file %s doesn't exist\n", input_filename);
     return 0;
   }
-
-  SmartFile output_file(output_filename);
+  writeHeader(output_filename);
+  SmartFile output_file(output_filename, "a");
 
   translate(input_file.getFile(), output_file.getFile());
 
   if (need_binary) {
     printf("TODO\n");
   }
+
+  printf("good bye!\n");
   return 0;
 }

@@ -17,8 +17,13 @@ struct Command {
 };
 
 bool isJump(const std::string& cmd_name) {
-  return cmd_name == "jmp" || cmd_name == "call" || cmd_name == "je" || cmd_name == "jne" ||
+  return cmd_name == "jump" || cmd_name == "call" || cmd_name == "je" || cmd_name == "jne" ||
     cmd_name == "jl" || cmd_name == "jle";
+}
+
+bool isJump(size_t cmd_id) {
+  return cmd_id == 12 || cmd_id == 13 || cmd_id == 14 || cmd_id == 15 ||
+    cmd_id == 16 || cmd_id == 17;
 }
 
 class SmartFile {
