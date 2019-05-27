@@ -1,13 +1,67 @@
 #include <iostream>
+#include <cstring>
 #include <cstdio>
 
+#include "common_classes.h"
 #include "translator.h"
+
+void showUsage() {
+  printf("usage:\n");
+  printf("translator [-S|-b] myasm_binary result_file\n");
+  printf("modes:\n");
+  printf("-S - translate to x86 text\n");
+  printf("-b - translate to x86 binary file\n");
+}
+
+char getFlag(char* str) {
+  if (strlen(str) != 2 || str[0] != '-') {
+    return '?';
+  }
+  return str[1];
+}
 
 int main(int argc, char* argv[]) {
   if (argc < 3) {
-    std::cout << "usage:\n";
-    std::cout << "translator [-S] myasm_binary result_file\n";
+    printf("the number of arguments is too low!\n");
+    showUsage();
     return 0;
+  }
+  if (argc > 4) {
+    printf("the number of arguments is incorrect!\n");
+    showUsage();
+    return 0;
+  }
+
+  bool need_binary = false;
+
+  char* input_filename = argv[1];
+  char* output_filename = argv[2];
+
+  if (argc == 4) {
+    if (getFlag(argv[1]) == 'b') {
+      need_binary = true;
+    } else if (getFlag(argv[1]) != 'S') {
+      printf("unexpected flag %s\n", argv[1]);
+      showUsage();
+      return 0;
+    }
+    input_filename = argv[2];
+    output_filename = argv[3];
+  }
+
+  SmartFile input_file(input_filename);
+
+  if (!input_file.getFile()) {
+    printf("file %s doesn't exist\n", input_filename);
+    return 0;
+  }
+
+  SmartFile output_file(output_filename);
+
+  translate(input_file.getFile(), output_file.getFile());
+
+  if (need_binary) {
+    printf("TODO\n");
   }
   return 0;
 }

@@ -19,6 +19,7 @@ class FileBuffer {
     buf_size_ = fread((void*)buf_, sizeof(char), BUF_SIZE - 1, binary_file);
     buf_ptr_ = buf_;
     std::cout << "file size: " << buf_size_ << " bytes\n";
+    fclose(binary_file);
   }
 
   template<class Data>

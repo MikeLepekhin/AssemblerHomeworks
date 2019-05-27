@@ -13,12 +13,33 @@
 #include <set>
 #include <algorithm>
 #include <unordered_map>
+#include <cassert>
 
 #include "file_buffer.h"
 #include "exception.h"
 #include "common_classes.h"
 
 const int MAX_ARG_CNT = 10;
+
+
+std::string getRegisterX86(size_t register_id) {
+  assert(register_id > 0 && register_id <= 5 &&
+         "incorrect register! only rax, rbx, rcx, rdx and rex are allowed");
+
+  switch (register_id) {
+    case 1:
+      return "r8";
+    case 2:
+      return "r11";
+    case 3:
+      return "r13";
+    case 4:
+      return "r14";
+    case 5:
+      return "r15";
+  }
+  return "r228";
+}
 
 void readCommand(size_t cmd_id, const std::string& cmd,
                  size_t arg_cnt, size_t support_mask,
@@ -102,21 +123,21 @@ void decodeCommand(const Command<double>& command, size_t cmd_order,
   fprintf(decode_file, "\n");
 }
 
-void disassemblyCommand(size_t cmd_id, const char* cmd, size_t arg_cnt, size_t support_mask,
+void translateCommand(size_t cmd_id, const char* cmd, size_t arg_cnt, size_t support_mask,
                         FileBuffer& fbuffer, std::vector<Command<double>>& commands,
-std::set<size_t>& jumps_to, FILE* decode_file) {
-
-std::vector<std::pair<double, int>> args;
-
-readCommand(cmd_id, cmd, arg_cnt, support_mask, args, fbuffer);
-if (isJump(std::string(cmd))) {
-jumps_to.insert(static_cast<size_t>(args[0].first));
+  std::set<size_t>& jumps_to, FILE* decode_file) {
+  
+  std::vector<std::pair<double, int>> args;
+  
+  readCommand(cmd_id, cmd, arg_cnt, support_mask, args, fbuffer);
+  if (isJump(std::string(cmd))) {
+  jumps_to.insert(static_cast<size_t>(args[0].first));
+  }
+  commands.push_back(Command<double>{cmd_id, std::string(cmd), arg_cnt, args});
+  //decodeCommand(cmd, arg_cnt, arg_values, decode_file);
 }
-commands.push_back(Command<double>{cmd_id, std::string(cmd), arg_cnt, args});
-//decodeCommand(cmd, arg_cnt, arg_values, decode_file);
-}
 
-void disassembly(FILE* binary_file = stdin, FILE* decode_file = stdout) {
+void translate(FILE* binary_file = stdin, FILE* decode_file = stdout) {
   FileBuffer fbuffer(binary_file);
 
   std::set<size_t> jumps_to;
@@ -128,7 +149,7 @@ void disassembly(FILE* binary_file = stdin, FILE* decode_file = stdout) {
     switch (cur_cmd_id) {
 #define COMMAND(cmd_id, name, arg_cnt, arg_mask, source) \
     case cmd_id :\
-      disassemblyCommand(cmd_id, name, arg_cnt, arg_mask, fbuffer, commands, jumps_to, decode_file);\
+      translateCommand(cmd_id, name, arg_cnt, arg_mask, fbuffer, commands, jumps_to, decode_file);\
       break;
 
 #include "commands.h"
