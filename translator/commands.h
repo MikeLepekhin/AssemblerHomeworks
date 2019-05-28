@@ -4,6 +4,11 @@
    name" rax, rbx\n"\
   "push rax"\
 
+#define CONDITIONAL_JUMP(name) \
+  "pop rbx\n"\
+  "pop rax\n"\
+  "cmp rax, rbx\n"\
+   name" <arg0>"\
 
 COMMAND(1, "push", 1, 7,\
   "push <arg0>"\
@@ -55,36 +60,23 @@ COMMAND(12, "jump", 1, 1,\
   "jmp <arg0>"\
 )
 COMMAND(13, "call", 1, 1,\
-  "jmp <arg0>"\
+  "call <arg0>"\
 )
 COMMAND(14, "je", 1, 1,\
-  "pop rbx\n"\
-  "pop rax\n"\
-  "cmp rax, rbx\n"\
-  "je <arg0>"\
+  CONDITIONAL_JUMP("je")\
 )
 COMMAND(15, "jne", 1, 1,\
-  "pop rbx\n"\
-  "pop rax\n"\
-  "cmp rax, rbx\n"\
-  "jne <arg0>"\
+  CONDITIONAL_JUMP("jne")\
 )
 COMMAND(16, "jl", 1, 1,\
-  "pop rbx\n"\
-  "pop rax\n"\
-  "cmp rax, rbx\n"\
-  "jl <arg0>"\
+  CONDITIONAL_JUMP("jl")\
 )
 COMMAND(17, "jle", 1, 1,\
-  "pop rbx\n"\
-  "pop rax\n"\
-  "cmp rax, rbx\n"\
-  "jle <arg0>"\
+  CONDITIONAL_JUMP("jle")\
 )
 COMMAND(18, "ret", 0, 0,\
   "ret"\
 )
-
 COMMAND(27, "not", 0, 0,\
   "pop rax"\
   "not rax"\
