@@ -78,7 +78,8 @@ int main(int argc, char* argv[]) {
   translate(input_file.getFile(), output_file.getFile());
 
   if (need_binary) {
-    printf("TODO\n");
+    std::string nasm_str = "nasm -f elf64 " + std::string(input_filename) + " -o " + std::string(input_filename) + ".o";
+    system(nasm_str.c_str());
   }
 
   printf("good bye!\n");

@@ -1,3 +1,10 @@
+#define TWO_ARG_COMMAND(name) \
+  "pop rbx\n"\
+  "pop rax\n"\
+   name" rax, rbx\n"\
+  "push rax"\
+
+
 COMMAND(1, "push", 1, 7,\
   "push <arg0>"\
 )
@@ -6,17 +13,11 @@ COMMAND(2, "pop", 1, 6, \
 )
 
 COMMAND(3, "add", 0, 0,\
-  "pop rbx\n"\
-  "pop rax\n"\
-  "add rax, rbx\n"\
-  "push rax"\
+  TWO_ARG_COMMAND("add")\
 )
 
 COMMAND(4, "sub", 0, 0,\
-  "pop rbx\n"\
-  "pop rax\n"\
-  "sub rax, rbx\n"\
-  "push rax"\
+  TWO_ARG_COMMAND("sub")\
 )
 COMMAND(5, "mul", 0, 0,\
   "pop rbx\n"\
@@ -82,4 +83,19 @@ COMMAND(17, "jle", 1, 1,\
 )
 COMMAND(18, "ret", 0, 0,\
   "ret"\
+)
+
+COMMAND(27, "not", 0, 0,\
+  "pop rax"\
+  "not rax"\
+  "push rax"\
+)
+COMMAND(28, "and", 0, 0,\
+  TWO_ARG_COMMAND("and")\
+)
+COMMAND(29, "or", 0, 0,\
+  TWO_ARG_COMMAND("or")\
+)
+COMMAND(30, "xor", 0, 0,\
+  TWO_ARG_COMMAND("xor")\
 )

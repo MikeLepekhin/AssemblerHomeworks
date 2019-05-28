@@ -19,13 +19,19 @@
 #include "exception.h"
 #include "common_classes.h"
 
-void replace(std::string& str, const std::string& from, const std::string& to) {
+
+bool replace(std::string& str, const std::string& from, const std::string& to) {
   size_t start_pos = str.find(from);
 
-  //std::cout << "# REPLACE\n";
-  //std::cout << str << ' ' << from << ' ' << to << '\n';
-  assert(start_pos != std::string::npos);
+  if (start_pos == std::string::npos) {
+    return false;
+  }
   str.replace(start_pos, from.length(), to);
+  return true;
+}
+
+void replaceAllOccurancies(std::string& str, const std::string& from, const std::string& to) {
+  while (replace(str, from, to)) {}
 }
 
 std::string getRegisterX86(size_t register_id) {
@@ -53,7 +59,7 @@ void readCommand(size_t cmd_id,
 
   size_t arg_cnt_file = fbuffer.readFromBuffer<size_t>();
 
-  std::cout << "argument cnt in file: " << arg_cnt_file << '\n';
+  //std::cout << "argument cnt in file: " << arg_cnt_file << '\n';
 
   if (arg_cnt == 0) {
     return;
@@ -64,9 +70,9 @@ void readCommand(size_t cmd_id,
     double cur_val = fbuffer.readFromBuffer<double>();
 
     arg_values.push_back({cur_val, cur_type});
-    std::cout << cur_val << ' ' << cur_type << '\n';
+ //   std::cout << cur_val << ' ' << cur_type << '\n';
   }
-  std::cout << "real arg number:" << ' ' << arg_cnt << " arguments\n";
+ // std::cout << "real arg number:" << ' ' << arg_cnt << " arguments\n";
 }
 
 std::string getRamObject(int encoded) {
@@ -95,6 +101,12 @@ std::string decodeArgument(const std::pair<double, int>& arg) {
   }
 }
 
+std::string addTabs(std::string& cmd_x86) {
+  replaceAllOccurancies(cmd_x86, "\n", "<add_tab>");
+  replaceAllOccurancies(cmd_x86, "<add_tab>", "\n        ");
+  return "        " + cmd_x86;
+}
+
 void decodeCommand(Command<double>& command, size_t cmd_order,
                    const std::set<size_t>& jumps_to, FILE* decode_file) {
   if (jumps_to.find(cmd_order) != jumps_to.end()) {
@@ -105,14 +117,13 @@ void decodeCommand(Command<double>& command, size_t cmd_order,
 
   for (size_t arg_id = 0; arg_id < command.arg_cnt; ++arg_id) {
     if (!isJump(command.cmd_id)) {
-      replace(command.cmd_name, "<arg" + std::to_string(arg_id) + ">", decodeArgument(command.args[arg_id]));
+      replaceAllOccurancies(command.cmd_name, "<arg" + std::to_string(arg_id) + ">", decodeArgument(command.args[arg_id]));
     } else {
-      replace(command.cmd_name, "<arg" + std::to_string(arg_id) + ">", "label_cmd_" + decodeArgument(command.args[arg_id]));
+      replaceAllOccurancies(command.cmd_name, "<arg" + std::to_string(arg_id) + ">", "label_cmd_" + decodeArgument(command.args[arg_id]));
     }
   }
 
-  fprintf(decode_file, "%s", command.cmd_name.c_str());
-  fprintf(decode_file, "\n");
+  fprintf(decode_file, "%s\n", addTabs(command.cmd_name).c_str());
 }
 
 void translateCommand(size_t cmd_id, const char* code_x86, size_t arg_cnt, size_t support_mask,
@@ -126,7 +137,7 @@ void translateCommand(size_t cmd_id, const char* code_x86, size_t arg_cnt, size_
     jumps_to.insert(static_cast<size_t>(args[0].first));
   }
   commands.push_back(Command<double>{cmd_id, code_x86, arg_cnt, args});
-  std::cout << "translated\n";
+  //std::cout << "translated\n";
 }
 
 void translate(FILE* binary_file = stdin, FILE* decode_file = stdout) {
